@@ -1,0 +1,9 @@
+{
+	"name": "rockstarsFactory",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "edba2357-1ab2-4cb1-9385-7a58e3231458",
+		"tenantId": "c479ba0f-1489-48e3-9f64-b2a1598f8f8b"
+	}
+}
