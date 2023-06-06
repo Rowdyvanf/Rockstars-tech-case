@@ -1,0 +1,69 @@
+{
+	"name": "remove_columns_and_sink",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "raw_data_text_file",
+						"type": "DatasetReference"
+					},
+					"name": "textfile"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "raw_data_csv",
+						"type": "DatasetReference"
+					},
+					"name": "sink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectColumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          RAW_SONG as string,",
+				"          RAW_ARTIST as string,",
+				"          CALLSIGN as string,",
+				"          TIME as string,",
+				"          UNIQUE_ID as string,",
+				"          COMBINED as string,",
+				"          {First?} as string,",
+				"          Prop_7 as string,",
+				"          Prop_8 as string,",
+				"          Prop_9 as string,",
+				"          Prop_10 as string,",
+				"          Prop_11 as string,",
+				"          Prop_12 as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> textfile",
+				"textfile select(mapColumn(",
+				"          RAW_SONG,",
+				"          RAW_ARTIST,",
+				"          CALLSIGN,",
+				"          TIME,",
+				"          UNIQUE_ID,",
+				"          COMBINED,",
+				"          First = {First?}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectColumns",
+				"SelectColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink"
+			]
+		}
+	}
+}
