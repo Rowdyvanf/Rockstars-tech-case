@@ -232,11 +232,13 @@
 						"     skipDuplicateMapOutputs: true) ~> SelectColumns",
 						"SelectColumns sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     partitionFileNames:['raw_input_data.csv'],",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> sink"
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink"
 					]
 				}
 			},
