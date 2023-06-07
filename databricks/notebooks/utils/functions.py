@@ -11,9 +11,9 @@ class Functions():
     
     @staticmethod
     def import_data(db):
-        # '''
-        # import data from csv file in storage into a df
-        # '''
+        '''
+        import data from csv file in storage into a df
+        '''
         print('start import_data')
         storage_account_name = 'rockstars'
         storage_account_access_key = 'a29hrPDqbA3VbXr8teiBxM4ODCNFK2k7KEctyg34xGWIRa6ST3oj1pyTb4vtFfaTlWAAktsFQHgn+AStBpJ4FA=='
@@ -30,7 +30,8 @@ class Functions():
         from pyspark.sql.functions import from_unixtime
         from pyspark.sql.types import TimestampType, BooleanType
         df = df.select(col("RAW_SONG"),col("RAW_ARTIST"),col("CALLSIGN"),from_unixtime(df.TIME.cast("bigint")).cast(TimestampType()).alias("TIME"),col("UNIQUE_ID"),col("COMBINED"),df.First.cast("int").cast(BooleanType()))
-        df.write.mode("overwrite").saveAsTable(f"{db}.raw_songs_data")
+        table_name = f"{db}.raw_songs_data"
+        df.write.mode("overwrite").saveAsTable(table_name)
 
     @staticmethod
     def cleanup_data(db):
@@ -53,7 +54,7 @@ class Functions():
 
     @staticmethod
     def calculate_times_played(db):
-        print('start cleanupcalculate_times_played_data')
+        print('start calculate_times_played_data')
         # '''
         # Calculate the number of times a song has been played
         # '''
@@ -82,7 +83,7 @@ class Functions():
         storage_account_access_key = 'a29hrPDqbA3VbXr8teiBxM4ODCNFK2k7KEctyg34xGWIRa6ST3oj1pyTb4vtFfaTlWAAktsFQHgn+AStBpJ4FA=='
         blob_container = 'rocksongs'
         spark.conf.set('fs.azure.account.key.' + storage_account_name + '.blob.core.windows.net', storage_account_access_key)
-        filePath = "wasbs://" + self.blob_container + "@" + self.storage_account_name + ".blob.core.windows.net/lists/top10.csv"
+        filePath = "wasbs://" + blob_container + "@" + storage_account_name + ".blob.core.windows.net/lists/top10.csv"
         data.write.format('csv').mode('overwrite').option('header', 'true').save(filePath)
 
     @staticmethod
@@ -101,7 +102,7 @@ class Functions():
         storage_account_access_key = 'a29hrPDqbA3VbXr8teiBxM4ODCNFK2k7KEctyg34xGWIRa6ST3oj1pyTb4vtFfaTlWAAktsFQHgn+AStBpJ4FA=='
         blob_container = 'rocksongs'
         spark.conf.set('fs.azure.account.key.' + storage_account_name + '.blob.core.windows.net', storage_account_access_key)
-        filePath = "wasbs://" + self.blob_container + "@" + self.storage_account_name + ".blob.core.windows.net/lists/bottem10.csv"
+        filePath = "wasbs://" + blob_container + "@" + storage_account_name + ".blob.core.windows.net/lists/bottem10.csv"
         data.write.format('csv').mode('overwrite').option('header', 'true').save(filePath)
 
     @staticmethod
