@@ -83,7 +83,7 @@ class OrchestratorUtils(object):
                         StructField("status", StringType(), True),
                         StructField("log", StringType(), True)
                     ])
-                    newRow = spark.createDataFrame([(step['id'],step['name'],'to run', '', step['parameters'])],schema=schema)
+                    newRow = spark.createDataFrame([(step['id'],step['name'], step['parameters'], '', 'to run')],schema=schema)
                     orchestrator = orchestrator.union(newRow)
                     orchestrator = orchestrator.orderBy('id')
             orchestrator.write.mode("overwrite").saveAsTable(orchestrator_table)
@@ -96,11 +96,12 @@ class OrchestratorUtils(object):
     def execute_orchestrator(self, orchestrator):
         # execute all the steps in the orchestrator table that dont have a status as 'completed'
         try:
+            config_obj = Config()
+            orchestrator_table = f'{config_obj.control_db}.{config_obj.orchestrator_table_name}{self.process_name}'
             dfp = orchestrator.toPandas()
             functions = Functions()
             for index, row in dfp.iterrows():
                 if row['status'] != "completed":
-                    print(row)
                     try:
                         function_name = row['step']
                         parameters = row['parameters']
@@ -112,9 +113,10 @@ class OrchestratorUtils(object):
                         print(f"executing {row['step']} failed execution_error: {execution_error}")
                         row['status'] = "failed"
                         row['log'] = f"execution_error: {execution_error}"
-            orchestrator = spark.createDataFrame(dfp)
-            orchestrator.write.mode("overwrite").saveAsTable(orchestrator_table)
+                    orchestrator = spark.createDataFrame(dfp)
+                    orchestrator.write.mode("overwrite").saveAsTable(orchestrator_table)
             status = 'success'
+            print('completed')
         except Exception as execution_error:
             print(f"execute_orchestrator failed execution_error: {execution_error}")
             status = f"{execution_error}"
